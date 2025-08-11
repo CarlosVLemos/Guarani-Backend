@@ -1,0 +1,30 @@
+# Arquivos de configuração e pastas que não devem ir para a imagem
+docker-compose.yml
+docker/
+*.env
+*.log
+
+# Python cache e build
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+db.sqlite3
+
+# Node / Frontend
+node_modules
+.env.local
+.env.development
+.env.production
+
+# IDEs / Editores
+.vscode
+.idea
+*.iml
+
+# Ambientes virtuais
+.venv
+
+# Documentação
+README.md
