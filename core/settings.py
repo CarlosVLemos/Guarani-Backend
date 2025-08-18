@@ -1,5 +1,3 @@
-
-
 import os
 from pathlib import Path
 import environ
@@ -30,7 +28,8 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-uma-chave-secreta-falsa-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
+
 
 
 # Application definition
@@ -63,7 +62,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'core.urls' # Adapte para o seu projeto
+ROOT_URLCONF = 'core.urls' 
 
 TEMPLATES = [
     {
@@ -87,19 +86,11 @@ WSGI_APPLICATION = 'core.wsgi.application' # Adapte para o seu projeto
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# Verifica se a variável DATABASE_URL está no ambiente.
-if 'DATABASE_URL' in os.environ and env('DATABASE_URL'):
-    DATABASES = {
-        'default': env.db_url('DATABASE_URL')
-    }
-else:
-    # Fallback para SQLite se DATABASE_URL não estiver definida
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+DATABASES = {
+    # django-environ irá procurar por DATABASE_URL e, se não encontrar,
+    # usará o fallback para SQLite
+    'default': env.db_url(default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'))
+}
 
 
 # Password validation
@@ -141,6 +132,5 @@ SPECTACULAR_SETTINGS = {
 # CORS SETTINGS
 # For development, we allow all origins. 
 CORS_ALLOW_ALL_ORIGINS = True
-
 
 CORS_ALLOW_CREDENTIALS = True

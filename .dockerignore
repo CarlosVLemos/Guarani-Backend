@@ -1,6 +1,4 @@
 # Arquivos de configuração e pastas que não devem ir para a imagem
-docker-compose.yml
-docker/
 *.env
 *.log
 
