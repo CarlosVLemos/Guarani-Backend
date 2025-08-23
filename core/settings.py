@@ -1,3 +1,5 @@
+
+
 import os
 from pathlib import Path
 import environ
@@ -28,8 +30,7 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-uma-chave-secreta-falsa-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
-
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'drf_spectacular',
+    'django_filters',
     #apps
     'analytics',
     'users',
@@ -62,7 +64,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'core.urls' 
+ROOT_URLCONF = 'core.urls' # Adapte para o seu projeto
 
 TEMPLATES = [
     {
@@ -86,11 +88,19 @@ WSGI_APPLICATION = 'core.wsgi.application' # Adapte para o seu projeto
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    # django-environ irá procurar por DATABASE_URL e, se não encontrar,
-    # usará o fallback para SQLite
-    'default': env.db_url(default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'))
-}
+# Verifica se a variável DATABASE_URL está no ambiente.
+if 'DATABASE_URL' in os.environ and env('DATABASE_URL'):
+    DATABASES = {
+        'default': env.db_url('DATABASE_URL')
+    }
+else:
+    # Fallback para SQLite se DATABASE_URL não estiver definida
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -120,6 +130,20 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'projects.pagination.DefaultPageNumberPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.OrderingFilter',
+        'rest_framework.filters.SearchFilter',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
 }
 
 SPECTACULAR_SETTINGS = {
@@ -133,4 +157,9 @@ SPECTACULAR_SETTINGS = {
 # For development, we allow all origins. 
 CORS_ALLOW_ALL_ORIGINS = True
 
+
 CORS_ALLOW_CREDENTIALS = True
+
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
