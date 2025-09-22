@@ -53,6 +53,9 @@ INSTALLED_APPS = [
     'projects',
 ]
 
+# Configuração do modelo de usuário customizado
+AUTH_USER_MODEL = 'users.User'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -130,7 +133,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_PAGINATION_CLASS': 'projects.pagination.DefaultPageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'projects.pagination.StandardResultsSetPagination',
     'PAGE_SIZE': 20,
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',

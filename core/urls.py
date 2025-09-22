@@ -25,19 +25,21 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
-# Group API documentation URLs for better organization
-api_docs_urlpatterns = [
-    path("api/", include("projects.urls")),
+# URLs da API - Agrupadas para melhor organização
+api_urlpatterns = [
+    # apps
+    path("projects/", include("projects.urls")),
+    path("users/", include("users.urls")),
+
+    # Rotas da documentação (Swagger/ReDoc)
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
-    path(
-        "docs/",SpectacularSwaggerView.as_view(url_name="schema"),name="swagger-ui",),
-    path("redoc/",SpectacularRedocView.as_view(url_name="schema"),name="redoc",),
+    path("schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("schema/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 ]
 
 urlpatterns = [
-    path("api/", include("projects.urls")),
     path("admin/", admin.site.urls),
-    path("api/", include(api_docs_urlpatterns)),
+    path("api/", include(api_urlpatterns)),
 ]
 
 

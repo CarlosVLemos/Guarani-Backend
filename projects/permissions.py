@@ -1,18 +1,19 @@
-
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
-class IsOwnerForUnsafe(BasePermission):
+class IsProjectOwnerOrReadOnly(BasePermission):
     """
-    Owner-only for unsafe methods (PUT, PATCH, DELETE).
-    Read:
-      - owners and staff can read everything
-      - others can read only ACTIVE projects (enforced in view)
+    Permissão personalizada para permitir que apenas os donos de um projeto o editem.
+    - Qualquer usuário (autenticado ou não) pode visualizar (GET, HEAD, OPTIONS).
+    - Apenas o 'ofertante' (dono) do projeto pode modificar (PUT, PATCH, DELETE).
     """
+
     def has_object_permission(self, request, view, obj):
+        # Permissões de leitura são permitidas para qualquer requisição,
+        # então sempre permitiremos requisições GET, HEAD ou OPTIONS.
         if request.method in SAFE_METHODS:
-            if request.user.is_staff or obj.owner_id == getattr(request.user, "id", None):
-                return True
-            # non-owner/non-staff: allowed read only if ACTIVE (checked in the view's get_object)
             return True
-        return obj.owner_id == getattr(request.user, "id", None) or getattr(request.user, "is_staff", False)
+
+        # Permissões de escrita são permitidas apenas para o dono do projeto.
+        # O `obj` aqui é a instância do modelo `Project`.
+        return obj.ofertante == request.user
