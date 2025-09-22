@@ -7,9 +7,11 @@ from django.utils import timezone
 
 class ProjectQuerySet(models.QuerySet):
     def alive(self):
-        """Retorna apenas os projetos que não foram deletados (soft delete)."""
+        """Retorna apenas os projetos que não foram deletados (soft delete).""" 
         return self.filter(is_deleted=False)
 
+def document_upload_to(instance, filename):
+    return f"projects/{instance.project.id}/{filename}"
 
 class Project(models.Model):
     """Representa um projeto de crédito de carbono criado por um Ofertante."""
@@ -83,11 +85,6 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
-
-
-def document_upload_to(instance, filename):
-    return f"projects/{instance.project.id}/{filename}"
-
 
 class Document(models.Model):
     """Armazena documentos de verificação e relatórios de um projeto."""

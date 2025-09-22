@@ -2,11 +2,12 @@ from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser, FormParser
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 
-from .models import Project
-from .serializers import ProjectListSerializer, ProjectDetailSerializer
+from .models import Project, Document
+from .serializers import ProjectListSerializer, ProjectDetailSerializer, DocumentSerializer
 from .permissions import IsProjectOwnerOrReadOnly
 from .filters import ProjectFilter
 from .pagination import StandardResultsSetPagination
@@ -22,6 +23,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     - `update/partial_update`: Atualiza um projeto (apenas o dono).
     - `destroy`: Deleta um projeto (apenas o dono).
     - `my`: Retorna os projetos do usuário logado.
+    - `upload_document`: Adiciona um documento a um projeto.
     """
     permission_classes = [IsAuthenticatedOrReadOnly, IsProjectOwnerOrReadOnly]
     pagination_class = StandardResultsSetPagination
@@ -71,5 +73,22 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(ser.data)
         return Response(ser.data)
 
-    # TODO: Implementar upload de documentos com as devidas validações e serializers.
-    # A ação de upload de documentos foi removida temporariamente para simplificação.
+    @action(
+        detail=True, methods=["post"], url_path="documents",
+        parser_classes=[MultiPartParser, FormParser]
+    )
+    def upload_document(self, request, pk=None):
+        """Faz o upload de um documento para um projeto específico."""
+        project = self.get_object()
+        # A permissão IsProjectOwnerOrReadOnly já é checada para o objeto do projeto,
+        # então não precisamos de outra verificação de permissão aqui.
+        
+        file_obj = request.FILES.get("file")
+        if not file_obj:
+            return Response({"detail": "Envie um arquivo no campo 'file'."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        doc_name = request.data.get("name") or file_obj.name
+        document = Document.objects.create(project=project, name=doc_name, file=file_obj)
+        serializer = DocumentSerializer(document)
+        
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

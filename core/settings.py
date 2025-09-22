@@ -54,7 +54,7 @@ INSTALLED_APPS = [
 ]
 
 # Configuração do modelo de usuário customizado
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'users.BaseUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -144,6 +144,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],
