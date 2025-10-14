@@ -104,6 +104,12 @@ class BaseUser(AbstractBaseUser, PermissionsMixin):
         default=VerificationStatus.PENDING,
         verbose_name='status da verificação'
     )
+    wallet_balance = models.DecimalField(
+        max_digits=12, 
+        decimal_places=2, 
+        default=1000000.00, 
+        verbose_name='Saldo da Carteira (R$)'
+    )
     created_at = models.DateTimeField(default=timezone.now, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
     last_login = models.DateTimeField(null=True, blank=True)

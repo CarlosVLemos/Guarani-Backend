@@ -30,6 +30,7 @@ api_urlpatterns = [
     # apps
     path("projects/", include("projects.urls")),
     path("users/", include("users.urls")),
+    path("marketplace/", include("marketplace.urls")),
 
     # Rotas da documentação (Swagger/ReDoc)
     path("schema/", SpectacularAPIView.as_view(), name="schema"),

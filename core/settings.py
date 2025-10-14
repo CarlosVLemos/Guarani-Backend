@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'analytics',
     'users',
     'projects',
+    'marketplace',
 ]
 
 # Configuração do modelo de usuário customizado

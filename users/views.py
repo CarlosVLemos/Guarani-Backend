@@ -57,6 +57,7 @@ class BaseUserViewSet(viewsets.ModelViewSet):
         user.verification_status = status_
         user.is_verified = (status_ == User.VerificationStatus.APPROVED)
         user.save()
+        
         ser = self.get_serializer(user)
         return Response(ser.data)
 
