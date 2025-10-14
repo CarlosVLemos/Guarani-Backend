@@ -17,7 +17,7 @@ PROJECT_DATA = [
         "description": "Protege 50.000 hectares de floresta primária em Paragominas, evitando o desmatamento e apoiando comunidades locais com monitoramento participativo.",
         "project_type": Project.ProjectType.REFLORESTAMENTO,
         "location": "Paragominas, Pará",
-        "status": Project.Status.VALIDATED,
+        "status": Project.Status.ACTIVE,
         "credits": 150000,
         "price": Decimal("85.50")
     },
@@ -26,7 +26,7 @@ PROJECT_DATA = [
         "description": "Recuperação de 10.000 hectares de pastagens degradadas em Altamira com espécies nativas da Amazônia, criando um corredor ecológico.",
         "project_type": Project.ProjectType.REFLORESTAMENTO,
         "location": "Altamira, Pará",
-        "status": Project.Status.VALIDATED,
+        "status": Project.Status.ACTIVE,
         "credits": 85000,
         "price": Decimal("92.00")
     },
@@ -42,7 +42,7 @@ PROJECT_DATA = [
     {
         "name": "Energia Limpa de Tucuruí",
         "description": "Projeto de substituição de geradores a diesel por painéis solares em comunidades ribeirinhas próximas a Tucuruí.",
-        "project_type": Project.ProjectType.ENERGIA_RENOVAvel,
+        "project_type": Project.ProjectType.ENERGIA_RENOVAVEL,
         "location": "Tucuruí, Pará",
         "status": Project.Status.VALIDATED,
         "credits": 60000,
