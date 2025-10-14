@@ -24,7 +24,7 @@ class Project(models.Model):
 
     class ProjectType(models.TextChoices):
         REFLORESTAMENTO = "REFLORESTAMENTO", "Reflorestamento e Conservação"
-        ENERGIA_RENOVAvel = "ENERGIA_RENOVAvel", "Energia Renovável"
+        ENERGIA_RENOVAVEL = "ENERGIA_RENOVAVEL", "Energia Renovável"
         AGRICULTURA = "AGRICULTURA", "Agricultura de Baixo Carbono"
         GESTAO_RESIDUOS = "GESTAO_RESIDUOS", "Gestão de Resíduos"
         OUTRO = "OUTRO", "Outro"

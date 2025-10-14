@@ -1,5 +1,6 @@
 import uuid
 import re
+from decimal import Decimal
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -107,7 +108,7 @@ class BaseUser(AbstractBaseUser, PermissionsMixin):
     wallet_balance = models.DecimalField(
         max_digits=12, 
         decimal_places=2, 
-        default=1000000.00, 
+        default=Decimal('1000000.00'), 
         verbose_name='Saldo da Carteira (R$)'
     )
     created_at = models.DateTimeField(default=timezone.now, editable=False)

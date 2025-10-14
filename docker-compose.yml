@@ -12,6 +12,7 @@ services:
       - redis
     volumes:
       - .:/app
+      - media_data:/app/media
 
 
   db:
@@ -35,3 +36,4 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  media_data:
