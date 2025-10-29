@@ -3,7 +3,10 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from drf_spectacular.utils import extend_schema
-
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView as BaseTokenObtainPairView,
+    TokenRefreshView as BaseTokenRefreshView,
+)
 from .serializers import (
     BaseUserSerializer,
     CompradorProfileSerializer, CompradorOrganizationSerializer,
@@ -22,21 +25,12 @@ User = get_user_model()
 
 @extend_schema(tags=['Auth'])
 class UserRegistrationView(generics.CreateAPIView):
-    """
-    View para registrar um novo usuário (Comprador ou Ofertante).
-    Acessível por qualquer um (AllowAny).
-    """
     serializer_class = UserRegistrationSerializer
     permission_classes = [permissions.AllowAny]
 
 
 @extend_schema(tags=['users'])
 class BaseUserViewSet(viewsets.ModelViewSet):
-    """
-    CRUD para o BaseUser. A criação é feita pela UserRegistrationView.
-    Outras operações exigem ser dono ou admin.
-    Admin pode verificar usuários via action 'verify'.
-    """
     queryset = User.objects.all()
     serializer_class = BaseUserSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
@@ -101,7 +95,6 @@ class CompradorProfileViewSet(viewsets.ModelViewSet):
             return self.queryset
         return self.queryset.filter(user=user)
 
-
 @extend_schema(tags=['Comprador'])
 class CompradorOrganizationViewSet(viewsets.ModelViewSet):
     queryset = CompradorOrganization.objects.all()
@@ -113,7 +106,6 @@ class CompradorOrganizationViewSet(viewsets.ModelViewSet):
         if user.is_staff:
             return self.queryset
         return self.queryset.filter(user=user)
-
 
 @extend_schema(tags=['Comprador'])
 class CompradorRequirementsViewSet(viewsets.ModelViewSet):
@@ -127,7 +119,6 @@ class CompradorRequirementsViewSet(viewsets.ModelViewSet):
             return self.queryset
         return self.queryset.filter(user=user)
 
-
 @extend_schema(tags=['Comprador'])
 class CompradorDocumentsViewSet(viewsets.ModelViewSet):
     queryset = CompradorDocuments.objects.all()
@@ -139,3 +130,12 @@ class CompradorDocumentsViewSet(viewsets.ModelViewSet):
         if user.is_staff:
             return self.queryset
         return self.queryset.filter(user=user)
+    
+@extend_schema(tags=['Auth'])
+class TokenObtainPairView(BaseTokenObtainPairView):
+
+    pass
+
+@extend_schema(tags=['Auth'])
+class TokenRefreshView(BaseTokenRefreshView):
+    pass

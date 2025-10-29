@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from .validators import validate_file_type_and_size
 from django.contrib.auth import get_user_model
 from django.db import transaction
 
@@ -26,6 +27,9 @@ class OfertanteDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = OfertanteDocument
         exclude = ['user']
+        extra_kwargs = {
+            'file': {'validators': [validate_file_type_and_size]}
+        }
 
 
 # --- Serializers para Comprador ---
@@ -49,6 +53,9 @@ class CompradorDocumentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompradorDocuments
         exclude = ['user']
+        extra_kwargs = {
+            'file': {'validators': [validate_file_type_and_size]}
+        }
 
 
 # --- Serializers de Usuário (Base e Registro) ---

@@ -9,15 +9,14 @@ from .views import (
     CompradorOrganizationViewSet,
     CompradorRequirementsViewSet,
     CompradorDocumentsViewSet,
-)
-from rest_framework_simplejwt.views import (
+    # Views para Auth com tags do Swagger
     TokenObtainPairView,
     TokenRefreshView,
 )
 
 # Cria um router para registrar os ViewSets
 router = DefaultRouter()
-router.register(r'users', BaseUserViewSet, basename='user')
+router.register(r'', BaseUserViewSet, basename='user')
 router.register(r'ofertante-profiles', OfertanteProfileViewSet, basename='ofertante-profile')
 router.register(r'ofertante-documents', OfertanteDocumentViewSet, basename='ofertante-document')
 router.register(r'comprador-profiles', CompradorProfileViewSet, basename='comprador-profile')
