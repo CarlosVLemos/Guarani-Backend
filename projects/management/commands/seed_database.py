@@ -107,7 +107,7 @@ class Command(BaseCommand):
                 project_type=random.choice(Project.ProjectType.choices)[0],
                 status=random.choice([Project.Status.ACTIVE, Project.Status.VALIDATED]),
                 carbon_credits_available=random.randint(1000, 20000),
-                price_per_credit=Decimal(random.uniform(40.0, 150.0))
+                price_per_credit=Decimal(f'{random.uniform(40.0, 150.0):.2f}')
             )
         self.stdout.write(self.style.SUCCESS("9 projetos criados."))
 
