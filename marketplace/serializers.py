@@ -45,3 +45,22 @@ class TransactionSerializer(serializers.ModelSerializer):
         if value <= 0:
             raise serializers.ValidationError("A quantidade de créditos deve ser um número positivo.")
         return value
+
+
+class PublicTransactionSerializer(serializers.ModelSerializer):
+    """
+    Serializer para a visualização pública de transações.
+    Expõe apenas dados não-sensíveis.
+    """
+    project_name = serializers.CharField(source='project.name', read_only=True)
+
+    class Meta:
+        model = Transaction
+        fields = [
+            'id',
+            'project_name',
+            'quantity',
+            'price_per_credit_at_purchase',
+            'total_price',
+            'timestamp'
+        ]

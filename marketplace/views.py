@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from django.db import transaction
 
 from .models import Transaction
-from .serializers import TransactionSerializer
+from .serializers import TransactionSerializer, PublicTransactionSerializer
 from projects.models import Project # Precisamos do modelo Project para pegar o preço
 
 class TransactionViewSet(mixins.CreateModelMixin,
@@ -62,3 +62,13 @@ class TransactionViewSet(mixins.CreateModelMixin,
         )
 
         # 6. TODO: Adicionar lógica para creditar os créditos ao projeto/vendedor (se aplicável).
+
+
+class PublicTransactionViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet para a visualização pública de transações.
+    - GET: Lista todas as transações de forma anônima.
+    """
+    queryset = Transaction.objects.all().select_related('project')
+    serializer_class = PublicTransactionSerializer
+    permission_classes = [permissions.AllowAny]
