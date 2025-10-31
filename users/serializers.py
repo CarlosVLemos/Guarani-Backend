@@ -118,3 +118,34 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         # Para Compradores, o perfil é criado em um passo separado
 
         return user
+
+
+# --- Serializer para /me ---
+class UserMeSerializer(serializers.ModelSerializer):
+    groups = serializers.SerializerMethodField()
+    is_auditor = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "user_type",
+            "is_active",
+            "is_verified",
+            "verification_status",
+            "is_staff",
+            "is_superuser",
+            "groups",
+            "is_auditor",
+            "created_at",
+            "updated_at",
+            "last_login",
+        ]
+        read_only_fields = fields
+
+    def get_groups(self, obj):
+        return list(obj.groups.values_list('name', flat=True))
+
+    def get_is_auditor(self, obj):
+        return obj.groups.filter(name__iexact='auditor').exists()

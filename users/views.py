@@ -12,7 +12,8 @@ from .serializers import (
     CompradorProfileSerializer, CompradorOrganizationSerializer,
     CompradorRequirementsSerializer, CompradorDocumentsSerializer,
     OfertanteProfileSerializer, OfertanteDocumentSerializer,
-    UserRegistrationSerializer
+    UserRegistrationSerializer,
+    UserMeSerializer,
 )
 from .models import (
     CompradorProfile, CompradorOrganization,
@@ -41,6 +42,12 @@ class BaseUserViewSet(viewsets.ModelViewSet):
         if user.is_staff:
             return self.queryset
         return self.queryset.filter(pk=user.pk)
+
+    @action(detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated])
+    def me(self, request):
+        """Retorna informações do usuário atual, incluindo grupos e is_auditor."""
+        serializer = UserMeSerializer(request.user)
+        return Response(serializer.data)
 
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAdminUser])
     def verify(self, request, pk=None):
