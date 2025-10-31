@@ -48,6 +48,8 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
             'id',
             'ofertante',
             'status',
+            'validated_by',
+            'validated_at',
             'created_at',
             'updated_at',
             'is_deleted'

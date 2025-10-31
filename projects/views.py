@@ -1,16 +1,18 @@
 from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser, FormParser
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
+from django.utils import timezone
 
 from .models import Project, Document
 from .serializers import ProjectListSerializer, ProjectDetailSerializer, DocumentSerializer
 from .permissions import IsProjectOwnerOrReadOnly
 from .filters import ProjectFilter
 from .pagination import StandardResultsSetPagination
+from users.permissions import IsAuditor
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -92,3 +94,36 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = DocumentSerializer(document)
         
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["post"], url_path="validate", permission_classes=[IsAuthenticated, IsAuditor])
+    def validate_project(self, request, pk=None):
+        """Valida um projeto (ação reservada a usuários do grupo Auditor)."""
+        project = self.get_object()
+
+        if project.status == Project.Status.VALIDATED:
+            return Response({"detail": "Projeto já está validado."}, status=status.HTTP_400_BAD_REQUEST)
+
+        project.status = Project.Status.VALIDATED
+        project.validated_by = request.user
+        project.validated_at = timezone.now()
+        project.save(update_fields=["status", "validated_by", "validated_at", "updated_at"])
+
+        serializer = ProjectDetailSerializer(project)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"], url_path="activate", permission_classes=[IsAuthenticated, IsProjectOwnerOrReadOnly])
+    def activate_project(self, request, pk=None):
+        """Ativa um projeto já VALIDATED (ação reservada ao dono do projeto)."""
+        project = self.get_object()
+
+        # Permissão a nível de objeto: somente o dono pode ativar
+        if project.ofertante != request.user:
+            return Response({"detail": "Apenas o ofertante pode ativar o projeto."}, status=status.HTTP_403_FORBIDDEN)
+
+        if project.status != Project.Status.VALIDATED:
+            return Response({"detail": "Somente projetos validados podem ser ativados."}, status=status.HTTP_400_BAD_REQUEST)
+
+        project.status = Project.Status.ACTIVE
+        project.save(update_fields=["status", "updated_at"])
+        serializer = ProjectDetailSerializer(project)
+        return Response(serializer.data, status=status.HTTP_200_OK)

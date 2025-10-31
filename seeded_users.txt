@@ -1,0 +1,8 @@
+Usuários criados pelo seeder:
+Senha padrão para todos: Teste#123
+
+ofertante.alvaro@example.com
+ofertante.samara@example.com
+ofertante.kettlyn@example.com
+ofertante.grandesprojetos@example.com
+comprador.rodrigo@example.com

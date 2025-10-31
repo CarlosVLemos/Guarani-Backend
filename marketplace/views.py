@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, status, mixins
+from rest_framework import viewsets, permissions, status, mixins, serializers
 from rest_framework.response import Response
 from django.db import transaction
 
@@ -43,25 +43,40 @@ class TransactionViewSet(mixins.CreateModelMixin,
                 {"detail": "O modelo de Projeto não possui um atributo 'price_per_credit'."}
             )
 
-        # 2. Calcula o preço total.
+        # 2. Valida status do projeto
+        if getattr(project, "status", None) != project.Status.ACTIVE:
+            raise serializers.ValidationError({"detail": "A compra só é permitida para projetos ativos."})
+
+        # 3. Valida disponibilidade de créditos
+        available = getattr(project, "carbon_credits_available", None)
+        if available is None:
+            raise serializers.ValidationError({"detail": "Projeto não informa 'carbon_credits_available'."})
+        if quantity > available:
+            raise serializers.ValidationError({"detail": "Quantidade solicitada excede os créditos disponíveis."})
+
+        # 4. Calcula o preço total.
         total_price = current_price_per_credit * quantity
 
-        # 3. TODO: Adicionar sua lógica de verificação de saldo do usuário aqui.
+        # 5. TODO: Adicionar sua lógica de verificação de saldo do usuário aqui.
         #    Ex: if self.request.user.profile.balance < total_price:
         #            raise serializers.ValidationError("Saldo insuficiente.")
 
-        # 4. TODO: Adicionar sua lógica para debitar o saldo do usuário aqui.
+        # 6. TODO: Adicionar sua lógica para debitar o saldo do usuário aqui.
         #    Ex: self.request.user.profile.balance -= total_price
         #        self.request.user.profile.save()
 
-        # 5. Salva a transação com os dados calculados e o comprador.
+        # 7. Salva a transação com os dados calculados e o comprador.
         serializer.save(
             buyer=self.request.user,
             price_per_credit_at_purchase=current_price_per_credit,
             total_price=total_price
         )
 
-        # 6. TODO: Adicionar lógica para creditar os créditos ao projeto/vendedor (se aplicável).
+        # 8. Debita créditos do projeto
+        project.carbon_credits_available = available - quantity
+        project.save(update_fields=["carbon_credits_available", "updated_at"])
+
+        # 9. TODO: Adicionar lógica para creditar os créditos ao projeto/vendedor (se aplicável).
 
 
 class PublicTransactionViewSet(viewsets.ReadOnlyModelViewSet):

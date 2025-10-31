@@ -46,6 +46,17 @@ class Project(models.Model):
 
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.DRAFT, verbose_name="Status")
 
+    # Campos de validação/aprovação por auditor
+    validated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="validated_projects",
+        verbose_name="Validado por"
+    )
+    validated_at = models.DateTimeField(null=True, blank=True, verbose_name="Data de Validação")
+
     ofertante = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,  # Evita apagar o projeto se o usuário for deletado
