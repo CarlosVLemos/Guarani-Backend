@@ -26,6 +26,8 @@ api_urlpatterns = [
 ]
 
 urlpatterns = [
+    # Redireciona a raiz do projeto para a documentação do Swagger
+    path("", RedirectView.as_view(url="/api/schema/swagger-ui/", permanent=False)),
     path("admin/", admin.site.urls),
     path("api/", include(api_urlpatterns)),
 ]

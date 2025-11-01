@@ -33,6 +33,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     filterset_class = ProjectFilter
     ordering_fields = ["created_at", "price_per_credit", "carbon_credits_available", "name"]
     search_fields = ["name", "description", "location", "project_type"]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_queryset(self):
         user = self.request.user
@@ -127,3 +128,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
         project.save(update_fields=["status", "updated_at"])
         serializer = ProjectDetailSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["get"], url_path="pending-validation", permission_classes=[IsAuthenticated, IsAuditor])
+    def pending_validation(self, request):
+        """Lista projetos pendentes de validação para auditores."""
+        qs = Project.objects.alive().exclude(status__in=[Project.Status.ACTIVE, Project.Status.VALIDATED])
+        page = self.paginate_queryset(qs)
+        ser = self.get_serializer(page or qs, many=True)
+
+        if page is not None:
+            return self.get_paginated_response(ser.data)
+        return Response(ser.data)

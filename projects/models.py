@@ -40,6 +40,7 @@ class Project(models.Model):
     location = models.CharField(max_length=180, blank=True, verbose_name="Localização (Cidade/Estado)")
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, verbose_name="Latitude")
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, verbose_name="Longitude")
+    image = models.ImageField(upload_to="projects/images/", blank=True, null=True, verbose_name="Imagem do Projeto")
 
     carbon_credits_available = models.PositiveIntegerField(default=0, verbose_name="Créditos de Carbono Disponíveis")
     price_per_credit = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Preço por Crédito (R$)")

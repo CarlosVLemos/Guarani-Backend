@@ -27,6 +27,7 @@ class ProjectListSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
+            'image',
             'project_type',
             'status',
             'carbon_credits_available',

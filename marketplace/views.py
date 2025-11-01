@@ -1,10 +1,12 @@
 from rest_framework import viewsets, permissions, status, mixins, serializers
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from django.db import transaction
 
 from .models import Transaction
 from .serializers import TransactionSerializer, PublicTransactionSerializer
 from projects.models import Project # Precisamos do modelo Project para pegar o preço
+from users.permissions import IsAuditor
 
 class TransactionViewSet(mixins.CreateModelMixin,
                          mixins.ListModelMixin,
@@ -87,3 +89,39 @@ class PublicTransactionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Transaction.objects.all().select_related('project')
     serializer_class = PublicTransactionSerializer
     permission_classes = [permissions.AllowAny]
+
+class TransactionAuditViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet para auditores gerenciarem transações.
+    - `list`: Retorna transações pendentes de aprovação.
+    - `approve`: Aprova uma transação.
+    - `reject`: Rejeita uma transação.
+    """
+    serializer_class = TransactionSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAuditor]
+
+    def get_queryset(self):
+        return Transaction.objects.filter(status=Transaction.Status.PENDING)
+
+    @action(detail=True, methods=["post"])
+    def approve(self, request, pk=None):
+        """Aprova uma transação pendente."""
+        transaction = self.get_object()
+        if transaction.status != Transaction.Status.PENDING:
+            return Response({"detail": "Apenas transações pendentes podem ser aprovadas."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        transaction.status = Transaction.Status.APPROVED
+        transaction.save(update_fields=["status"])
+        return Response(TransactionSerializer(transaction).data)
+
+    @action(detail=True, methods=["post"])
+    def reject(self, request, pk=None):
+        """Rejeita uma transação pendente."""
+        transaction = self.get_object()
+        if transaction.status != Transaction.Status.PENDING:
+            return Response({"detail": "Apenas transações pendentes podem ser rejeitadas."}, status=status.HTTP_400_BAD_REQUEST)
+
+        transaction.status = Transaction.Status.REJECTED
+        transaction.save(update_fields=["status"])
+        # Opcional: Adicionar lógica para reverter a dedução de créditos do projeto
+        return Response(TransactionSerializer(transaction).data)
