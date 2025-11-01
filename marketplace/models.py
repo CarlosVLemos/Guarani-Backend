@@ -3,6 +3,11 @@ from django.db import models
 from django.conf import settings
 
 class Transaction(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "PENDING", "Pendente"
+        APPROVED = "APPROVED", "Aprovado"
+        REJECTED = "REJECTED", "Rejeitado"
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     buyer= models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="buy_transactions", verbose_name="comprador")
     project = models.ForeignKey("projects.Project", on_delete=models.CASCADE, related_name="transactions", verbose_name="Projeto")
@@ -10,6 +15,7 @@ class Transaction(models.Model):
     price_per_credit_at_purchase = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Preço por Crédito(no momento da compra)")
     total_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Preço Total da Transação")
     timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Data da Transação")
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING, verbose_name="Status da Transação")
 
 
     class Meta:
@@ -19,6 +25,7 @@ class Transaction(models.Model):
         indexes = [
             models.Index(fields=['buyer']),
             models.Index(fields=['project']),
+            models.Index(fields=['status']),
         ]
 
     def __str__(self):

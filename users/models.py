@@ -83,6 +83,7 @@ class BaseUser(AbstractBaseUser, PermissionsMixin):
     class UserType(models.TextChoices):
         OFERTANTE = "OFERTANTE", "Ofertante"
         COMPRADOR = "COMPRADOR", "Comprador"
+        AUDITOR = "AUDITOR", "Auditor"
 
     class VerificationStatus(models.TextChoices):
         PENDING = "PENDING", "Pendente"
@@ -313,3 +314,20 @@ class CompradorDocuments(models.Model):
 
     def __str__(self):
         return f"{self.document_type} - {self.user.email}"
+
+
+# -------------------------
+# MODELOS: AUDITORES
+# -------------------------
+class AuditorProfile(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="auditor_profile")
+    contact_name = models.CharField(max_length=255, blank=True, null=True)
+    phone = models.CharField(max_length=50)
+
+    def clean(self):
+        if getattr(self.user, "user_type", None) != BaseUser.UserType.AUDITOR:
+            raise ValidationError("Profile de Auditor só pode ser associado a um BaseUser com user_type='AUDITOR'.")
+
+    def __str__(self):
+        return f"AuditorProfile: {self.user.email}"

@@ -66,3 +66,31 @@ Pronto! Sua aplicação está no ar e acessível nos seguintes endereços:
 - **API Principal**: [http://localhost:8000/](http://localhost:8000/)
 - **Documentação da API (Swagger UI)**: [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
 - **Admin do Django**: [http://localhost:8000/admin/](http://localhost:8000/admin/)
+
+## Fluxo de aprovação de projetos (Auditoria)
+
+Para garantir a qualidade dos créditos, implementamos uma etapa de validação por Auditor:
+
+- Crie/adicione usuários ao grupo `auditor` (ou use um usuário staff/superuser).
+- Somente Auditores podem validar um projeto via endpoint dedicado.
+- Após validado, somente o ofertante (dono) pode ativar o projeto.
+- Apenas projetos `ACTIVE` podem ser comprados no marketplace.
+
+Endpoints:
+
+- POST `/api/projects/{id}/validate/` — valida o projeto (somente Auditor)
+- POST `/api/projects/{id}/activate/` — ativa o projeto validado (somente Ofertante dono)
+
+Campos adicionados ao modelo `Project`:
+
+- `validated_by`: usuário auditor que validou o projeto
+- `validated_at`: data/hora da validação
+
+Passos rápidos (com Docker):
+
+```bash
+docker-compose exec api python manage.py migrate
+docker-compose exec api python manage.py seed_auditor_group
+```
+
+Depois, atribua um usuário ao grupo `auditor` pelo admin do Django ou shell.
