@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'users',
     'projects',
     'marketplace',
+    'calculator',
 ]
 
 # Configuração do modelo de usuário customizado
